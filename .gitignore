@@ -1,0 +1,54 @@
+# ==============================
+# SECRETS - JAMAIS COMMITÉS
+# ==============================
+.env
+mosquitto/certs/*.key
+mosquitto/certs/*.pem
+mosquitto/config/password_file
+
+# ==============================
+# Flutter / Dart
+# ==============================
+mobile-app/.dart_tool/
+mobile-app/.flutter-plugins
+mobile-app/.flutter-plugins-dependencies
+mobile-app/.packages
+mobile-app/build/
+mobile-app/.idea/
+mobile-app/*.iml
+mobile-app/ios/Pods/
+mobile-app/ios/.symlinks/
+mobile-app/android/.gradle/
+mobile-app/android/local.properties
+
+# ==============================
+# Node.js / Next.js (backend)
+# ==============================
+backend/node_modules/
+backend/.next/
+backend/.env
+backend/.env.local
+backend/npm-debug.log*
+
+# ==============================
+# Arduino
+# ==============================
+firmware/*.hex
+firmware/build/
+
+# ==============================
+# Docker - données générées
+# ==============================
+postgres/data/
+influxdb/data/
+mosquitto/data/
+mosquitto/log/
+
+# ==============================
+# Système / Éditeurs
+# ==============================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

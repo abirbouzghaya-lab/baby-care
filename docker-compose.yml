@@ -1,0 +1,71 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/certs:/mosquitto/certs
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - baby-net
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - baby-net
+    restart: unless-stopped
+
+  influxdb:
+    image: influxdb:2
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUX_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUX_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUX_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUX_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_ADMIN_TOKEN}
+    networks:
+      - baby-net
+    restart: unless-stopped
+
+  nodejs:
+    image: node:20
+    container_name: nodejs-backend
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - ./mosquitto/certs:/app/certs
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && node index.js"
+    depends_on:
+      - mosquitto
+      - influxdb
+      - postgres
+    env_file:
+      - .env
+    networks:
+      - baby-net
+    restart: unless-stopped
+
+networks:
+  baby-net:
+    driver: bridge
